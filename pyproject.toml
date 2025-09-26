@@ -12,6 +12,9 @@ dependencies = [
     "uvicorn[standard]>=0.24.0",
     "python-dotenv>=1.0.0",
     "pydantic-settings>=2.11.0",
+    "ffmpeg-python>=0.2.0",
+    "openai>=1.109.1",
+    "yt-dlp>=2025.9.23",
 ]
 
 
