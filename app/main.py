@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from .config import settings
 from .video_processor import extract_highlights_from_video
 from .downloader import download_video
-from .clip_extractor import extract_clip
+from .clip_extractor import extract_clips
 import hashlib
 import os
 
@@ -12,27 +12,6 @@ app = FastAPI(
     version=settings.app_version,
     debug=settings.debug,
 )
-
-
-async def extract_clips(highlights, video_file: str, output_dir: str) -> list:
-    """Extract highlight clips from video using existing clip_extractor"""
-    clip_files = []
-
-    for i, highlight in enumerate(highlights):
-        clip_filename = f"highlight_{i+1}_{highlight.start_time}-{highlight.end_time}.mp4"
-        clip_path = os.path.join(output_dir, clip_filename)
-
-        # Use existing extract_clip function
-        await extract_clip(video_file, highlight.start_time, highlight.end_time, clip_path)
-
-        clip_files.append({
-            "file": clip_path,
-            "start_time": highlight.start_time,
-            "end_time": highlight.end_time,
-            "description": highlight.description
-        })
-
-    return clip_files
 
 
 @app.get("/")
