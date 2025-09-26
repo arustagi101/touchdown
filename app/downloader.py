@@ -3,7 +3,7 @@ from typing import Dict
 import yt_dlp
 
 
-async def download_video(self, url: str, output_path: str) -> Dict:
+async def download_video(url: str, output_path: str) -> Dict:
     ydl_opts = {
         "outtmpl": output_path,
         "format": "best[ext=mp4]/best",
