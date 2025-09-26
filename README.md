@@ -28,16 +28,7 @@ Use `uv run` to execute commands in the project environment:
 
 ```bash
 # Run a Python script
-uv run python main.py
-
-# Run a module
-uv run -m pytest
-
-# Run with arguments
-uv run python script.py --verbose
-
-# Run any installed console script
-uv run mypy src/
+uv run python -m touchdown
 ```
 
 The `uv run` command automatically manages the virtual environment and ensures all dependencies are available.
