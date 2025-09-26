@@ -12,5 +12,8 @@ wheels/
 .env
 
 **.mp4
+# allow intro and outro videos
+!app/highlights_intro.mp4
+!app/highlights_outro.mp4
 
 .DS_Store
