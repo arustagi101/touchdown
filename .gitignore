@@ -5,6 +5,8 @@ build/
 dist/
 wheels/
 *.egg-info
-
+.env
+src/touchdown/.env
+src/.env
 # Virtual environments
 .venv
