@@ -15,6 +15,7 @@ dependencies = [
     "ffmpeg-python>=0.2.0",
     "openai>=1.109.1",
     "yt-dlp>=2025.9.23",
+    "youtube-transcript-api>=1.2.2",
 ]
 
 

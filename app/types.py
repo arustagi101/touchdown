@@ -6,7 +6,12 @@ class HighlightClip(BaseModel):
     """Individual highlight clip with timing and description"""
     start_time: float  # Start time in seconds
     end_time: float    # End time in seconds
-    description: str   # Description of what happens in this clip
+    start_time_formatted: Optional[str] = None  # Formatted start time (HH:MM:SS)
+    end_time_formatted: Optional[str] = None    # Formatted end time (HH:MM:SS)
+    duration: Optional[float] = None            # Duration in seconds
+    description: str                            # Description of what happens in this clip
+    importance_score: Optional[float] = None    # Importance score (0-10)
+    category: Optional[str] = None              # Category of the highlight
 
 
 class HighlightsMetadata(BaseModel):
