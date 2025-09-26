@@ -1,6 +1,6 @@
 # Touchdown
 
-A Python project managed with uv.
+A FastAPI application managed with uv.
 
 ## Getting Started
 
@@ -14,21 +14,21 @@ uv add requests
 
 # Add a development dependency
 uv add --dev pytest
-
-# Add a dependency with version constraints
-uv add "django>=4.0,<5.0"
-
-# Add an optional dependency group
-uv add --optional web fastapi uvicorn
 ```
 
-### Running Commands
+### Running the FastAPI Application
 
-Use `uv run` to execute commands in the project environment:
+Use FastAPI's development server:
 
 ```bash
-# Run a Python script
-uv run python -m touchdown
+uv run fastapi dev app/main.py
 ```
+
+The application will be available at:
+- Main endpoint: http://localhost:8000/
+- Health check: http://localhost:8000/health
+- API endpoint: http://localhost:8000/api/v1/touchdown
+- Interactive docs: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
 
 The `uv run` command automatically manages the virtual environment and ensures all dependencies are available.
