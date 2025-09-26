@@ -3,13 +3,13 @@ import re
 from typing import List
 from openai import OpenAI
 from .models import Highlight
-
+from app.config import settings
 
 class SportsHighlightAnalyzer:
     """Analyzes sports video transcripts using OpenAI to identify highlight moments."""
     
     def __init__(self):
-        self.client = OpenAI()
+        self.client = OpenAI(api_key=settings.openai_api_key)
     
     def analyze_transcript(self, transcript_text: str, max_highlights: int = 20) -> List[Highlight]:
         """

@@ -19,6 +19,10 @@ app = FastAPI(
     debug=settings.debug,
 )
 
+def hash_url(url: str):
+    url_hash = hashlib.md5(url.encode()).hexdigest()
+    output_dir = f"./output/{url_hash}"
+    return url_hash, output_dir
 
 @app.get("/download", response_model=DownloadResponse)
 async def download(
@@ -26,8 +30,7 @@ async def download(
 ) -> DownloadResponse:
     try:
         # Create hash of video URL for folder name
-        url_hash = hashlib.md5(url.encode()).hexdigest()
-        output_dir = f"./output/{url_hash}"
+        url_hash, output_dir = hash_url(url)
         output_path = os.path.join(output_dir, "video.mp4")
 
         # Create output directory
@@ -72,30 +75,90 @@ async def download(
 
 @app.get("/highlights", response_model=List[HighlightClip])
 async def highlights(
-    url: str = "https://www.youtube.com/watch?v=caqxkOKPE2U", max_highlights: int = 5
+    url: str = "https://www.youtube.com/watch?v=caqxkOKPE2U",
+    max_highlights: int = 5,
+    overwrite: bool = False
 ) -> List[HighlightClip]:
-    extractor = HighlightExtractor()
-    print(f"Analyzing video: {url}")
+    try:
+        url_hash, output_dir = hash_url(url)
+        clips_json_path = os.path.join(output_dir, "clips.json")
 
-    # Get the JSON result from the extractor
-    result = extractor.extract_highlights_to_json(url, max_highlights)
+        # Check if clips.json exists and overwrite is False
+        if os.path.exists(clips_json_path) and not overwrite:
+            print(f"Loading cached highlights from: {clips_json_path}")
+            import json
+            with open(clips_json_path, 'r') as f:
+                cached_result = json.load(f)
 
-    # Map JSON result to HighlightClip objects
-    highlight_clips = []
-    for highlight_data in result:
-        clip = HighlightClip(
-            start_time=highlight_data["start_time"],
-            end_time=highlight_data["end_time"],
-            start_time_formatted=highlight_data.get("start_time_formatted"),
-            end_time_formatted=highlight_data.get("end_time_formatted"),
-            duration=highlight_data.get("duration"),
-            description=highlight_data["description"],
-            importance_score=highlight_data.get("importance_score"),
-            category=highlight_data.get("category"),
-        )
-        highlight_clips.append(clip)
+            # Convert cached result to HighlightClip objects
+            highlight_clips = []
+            for highlight_data in cached_result:
+                clip = HighlightClip(**highlight_data)
+                highlight_clips.append(clip)
 
-    return highlight_clips
+            print(f"Loaded {len(highlight_clips)} cached highlights")
+            return highlight_clips
+
+        # Create output directory if it doesn't exist
+        os.makedirs(output_dir, exist_ok=True)
+
+        extractor = HighlightExtractor()
+        print(f"Analyzing video: {url} (max_highlights: {max_highlights})")
+
+        # Get the JSON result from the extractor
+        result = extractor.extract_highlights_to_json(url, max_highlights)
+
+        # Debug: Print the result structure
+        print(f"Result type: {type(result)}")
+        print(f"Result content: {result}")
+
+        # Handle different possible result structures
+        if isinstance(result, dict):
+            # If result is a dict, it might contain a list of highlights
+            if 'highlights' in result:
+                highlights_data = result['highlights']
+            else:
+                # Treat the dict as a single highlight
+                highlights_data = [result]
+        elif isinstance(result, list):
+            # Result is already a list of highlights
+            highlights_data = result
+        else:
+            raise ValueError(f"Unexpected result type: {type(result)}")
+
+        # Map JSON result to HighlightClip objects
+        highlight_clips = []
+        for highlight_data in highlights_data:
+            # Ensure highlight_data is a dictionary
+            if not isinstance(highlight_data, dict):
+                print(f"Skipping invalid highlight data: {highlight_data}")
+                continue
+
+            clip = HighlightClip(
+                start_time=highlight_data.get("start_time", 0.0),
+                end_time=highlight_data.get("end_time", 0.0),
+                start_time_formatted=highlight_data.get("start_time_formatted"),
+                end_time_formatted=highlight_data.get("end_time_formatted"),
+                duration=highlight_data.get("duration"),
+                description=highlight_data.get("description", "No description available"),
+                importance_score=highlight_data.get("importance_score"),
+                category=highlight_data.get("category"),
+            )
+            highlight_clips.append(clip)
+
+        # Save highlights to clips.json for caching
+        import json
+        clips_data = [clip.dict() for clip in highlight_clips]
+        with open(clips_json_path, 'w') as f:
+            json.dump(clips_data, f, indent=2)
+
+        print(f"Saved {len(highlight_clips)} highlights to: {clips_json_path}")
+        return highlight_clips
+
+    except Exception as e:
+        print(f"Error in highlights endpoint: {str(e)}")
+        # Return empty list or raise HTTPException
+        return []
 
 
 @app.get("/")
@@ -127,6 +190,7 @@ async def processVideo(url: str = "https://www.youtube.com/watch?v=caqxkOKPE2U")
             "video_url": url,
             "download_step": download_result,
             "highlights_count": len(highlights_result),
+            "clips": clip_files,
             "message": "Video processed successfully",
         }
 

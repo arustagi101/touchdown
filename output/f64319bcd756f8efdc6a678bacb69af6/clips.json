@@ -1,0 +1,52 @@
+[
+  {
+    "start_time": 1001.0,
+    "end_time": 1015.0,
+    "start_time_formatted": "16:41",
+    "end_time_formatted": "16:55",
+    "duration": 14.0,
+    "description": "Jason Myers drills a 52-yard field goal as time expires to give Seattle the win after a sideline catch review.",
+    "importance_score": 10.0,
+    "category": "field_goal"
+  },
+  {
+    "start_time": 929.0,
+    "end_time": 938.0,
+    "start_time_formatted": "15:29",
+    "end_time_formatted": "15:38",
+    "duration": 9.0,
+    "description": "Kyler Murray finds Emari Demercado leaking out, and he sprints to the pylon for the game-tying touchdown with 28 seconds left.",
+    "importance_score": 9.5,
+    "category": "touchdown"
+  },
+  {
+    "start_time": 881.0,
+    "end_time": 886.0,
+    "start_time_formatted": "14:41",
+    "end_time_formatted": "14:46",
+    "duration": 5.0,
+    "description": "On 4th down, Michael Wilson makes a spectacular one-handed grab to keep Arizona’s late drive alive.",
+    "importance_score": 9.2,
+    "category": "4th_down_conversion"
+  },
+  {
+    "start_time": 89.0,
+    "end_time": 163.0,
+    "start_time_formatted": "01:29",
+    "end_time_formatted": "02:43",
+    "duration": 74.0,
+    "description": "An interception is fumbled back and, after review, the ruling stands for Arizona amid confusion and a premature Seahawks celebration.",
+    "importance_score": 9.0,
+    "category": "controversy"
+  },
+  {
+    "start_time": 844.0,
+    "end_time": 853.0,
+    "start_time_formatted": "14:04",
+    "end_time_formatted": "14:13",
+    "duration": 9.0,
+    "description": "Jason Myers misses a late field goal that would have made it a two-score game, keeping Arizona within striking distance.",
+    "importance_score": 8.8,
+    "category": "missed_field_goal"
+  }
+]
