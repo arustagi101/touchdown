@@ -108,65 +108,53 @@ async def processVideo(url: str = "https://www.youtube.com/watch?v=caqxkOKPE2U")
 
 @app.get("/extract-clips")
 async def extract_clips_from_video(
-    video_path: str,
-    output_dir: str = None
+    url: str = "https://www.youtube.com/watch?v=caqxkOKPE2U"
 ):
     """
-    Extract highlight clips from a local video file.
+    Extract highlight clips from a video URL.
     
     Args:
-        video_path: Path to the local video file
-        output_dir: Directory to save clips (optional, defaults to ./output/clips_TIMESTAMP)
+        url: YouTube video URL (defaults to a sample video)
     """
     try:
-        # Check if video file exists
+        # Create hash of video URL for folder name (same as download)
+        url_hash = hashlib.md5(url.encode()).hexdigest()
+        output_dir = f"./output/{url_hash}"
+        video_path = os.path.join(output_dir, "video.mp4")
+        
+        # Check if video file exists locally
         if not os.path.exists(video_path):
             return {
                 "success": False,
-                "error": f"Video file not found: {video_path}",
-                "message": "Please provide a valid video file path"
+                "error": f"Video file not found locally: {video_path}",
+                "message": "Please download the video first using /download endpoint",
+                "video_url": url,
+                "url_hash": url_hash,
+                "suggested_action": f"Run: GET /download?url={url}"
             }
         
-        # Set default output directory if not provided
-        if output_dir is None:
-            import datetime
-            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-            output_dir = f"./output/clips_{timestamp}"
+        # Create clips subdirectory within the same output folder
+        clips_dir = os.path.join(output_dir, "clips")
+        os.makedirs(clips_dir, exist_ok=True)
         
-        # Create output directory
-        os.makedirs(output_dir, exist_ok=True)
+        # Extract highlights from the video
+        print(f"Extracting highlights from: {url}")
+        highlights = await extract_highlights_from_video(url)
         
-        # Define default highlights
-        highlight_clips = [
-            HighlightClip(
-                start_time=1.0,
-                end_time=3.0,
-                description="Opening highlight - 2 second clip"
-            ),
-            HighlightClip(
-                start_time=5.0,
-                end_time=7.5,
-                description="Main action - 2.5 second clip"
-            ),
-            HighlightClip(
-                start_time=8.0,
-                end_time=9.0,
-                description="Closing highlight - 1 second clip"
-            )
-        ]
-        
-        # Extract clips
-        clip_files = await extract_clips(highlight_clips, video_path, output_dir)
+        # Extract clips using the highlights
+        clip_files = await extract_clips(highlights, video_path, clips_dir)
         
         # Calculate total size
         total_size = sum(os.path.getsize(clip["file"]) for clip in clip_files)
         
         return {
             "success": True,
-            "message": "Clips extracted successfully",
+            "message": f"Clips extracted successfully to {clips_dir}",
+            "video_url": url,
+            "url_hash": url_hash,
             "video_path": video_path,
-            "output_directory": output_dir,
-            "highlights_count": len(highlight_clips),
+            "clips_directory": clips_dir,
+            "highlights_count": len(highlights),
             "clips": clip_files,
             "total_size_bytes": total_size,
             "total_size_mb": round(total_size / 1024 / 1024, 2)
@@ -177,7 +165,7 @@ async def extract_clips_from_video(
             "success": False,
             "error": str(e),
             "message": "Failed to extract clips",
-            "video_path": video_path
+            "video_url": url
         }
 
 
