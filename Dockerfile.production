@@ -1,0 +1,66 @@
+# Multi-stage build for production
+
+# Backend builder
+FROM python:3.11-slim as backend-builder
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY backend/requirements.txt .
+RUN pip install --user --no-cache-dir -r requirements.txt
+
+# Frontend builder
+FROM node:20-alpine as frontend-builder
+
+WORKDIR /app
+
+COPY frontend/package*.json ./
+RUN npm ci
+
+COPY frontend/ .
+RUN npm run build
+
+# Final production image
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    nginx \
+    supervisor \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy Python packages
+COPY --from=backend-builder /root/.local /root/.local
+ENV PATH=/root/.local/bin:$PATH
+
+# Copy backend
+COPY backend/ ./backend/
+
+# Copy frontend build
+COPY --from=frontend-builder /app/.next ./frontend/.next
+COPY --from=frontend-builder /app/public ./frontend/public
+COPY --from=frontend-builder /app/package*.json ./frontend/
+
+# Install Node.js for Next.js production server
+RUN apt-get update && apt-get install -y nodejs npm && \
+    cd frontend && npm ci --production && \
+    apt-get remove -y npm && apt-get autoremove -y && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy nginx config
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Copy supervisor config
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
+# Create necessary directories
+RUN mkdir -p /tmp/touchdown /var/log/supervisor
+
+EXPOSE 80 8000
+
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
