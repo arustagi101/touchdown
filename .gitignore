@@ -8,3 +8,51 @@ wheels/
 
 # Virtual environments
 .venv
+venv/
+env/
+
+# Node.js
+node_modules/
+.next/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.local
+.env.*.local
+*.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+logs/
+*.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Redis
+dump.rdb
+
+# Temporary files
+/tmp/
+*.tmp
+*.temp
+
+# Coverage
+coverage/
+.coverage
+htmlcov/
+
+# Docker volumes
+postgres_data/
