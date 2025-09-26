@@ -8,8 +8,8 @@ from .models import Highlight
 class SportsHighlightAnalyzer:
     """Analyzes sports video transcripts using OpenAI to identify highlight moments."""
     
-    def __init__(self, api_key: str):
-        self.client = OpenAI(api_key=api_key)
+    def __init__(self):
+        self.client = OpenAI()
     
     def analyze_transcript(self, transcript_text: str, max_highlights: int = 20) -> List[Highlight]:
         """
