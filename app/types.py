@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 
 
 class HighlightClip(BaseModel):
@@ -16,4 +16,17 @@ class HighlightsMetadata(BaseModel):
     highlights: List[HighlightClip]
     processing_status: str = "completed"
     success: bool = True
+    error: Optional[str] = None
+
+
+class DownloadResponse(BaseModel):
+    """Response from video download API"""
+    success: bool
+    message: str
+    video_url: str
+    url_hash: Optional[str] = None
+    output_directory: Optional[str] = None
+    output_path: Optional[str] = None
+    video_info: Optional[Dict[str, Any]] = None
+    already_exists: Optional[bool] = None
     error: Optional[str] = None
