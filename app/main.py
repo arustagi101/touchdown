@@ -25,6 +25,14 @@ def hash_url(url: str):
     output_dir = f"./output/{url_hash}"
     return url_hash, output_dir
 
+@app.get("/hash")
+def hash(url: str = "https://www.youtube.com/watch?v=caqxkOKPE2U"):
+    url_hash, output_dir = hash_url(url)
+    return {
+        url_hash,
+        output_dir
+    }
+
 @app.get("/download", response_model=DownloadResponse)
 async def download(
     url: str = "https://www.youtube.com/watch?v=caqxkOKPE2U",
@@ -40,6 +48,26 @@ async def download(
         # Check if video already exists
         if os.path.exists(output_path):
             print(f"Video already exists at: {output_path}")
+
+            # Try to load existing metadata
+            metadata_path = os.path.join(output_dir, "metadata.json")
+            video_info = None
+            if os.path.exists(metadata_path):
+                try:
+                    import json
+                    with open(metadata_path, 'r') as f:
+                        metadata = json.load(f)
+                    video_info = {
+                        "title": metadata.get("title"),
+                        "duration": metadata.get("duration"),
+                        "fps": metadata.get("fps"),
+                        "width": metadata.get("width"),
+                        "height": metadata.get("height")
+                    }
+                    print(f"Loaded existing metadata from: {metadata_path}")
+                except Exception as e:
+                    print(f"Failed to load metadata: {e}")
+
             return DownloadResponse(
                 success=True,
                 message="Video already downloaded",
@@ -47,12 +75,34 @@ async def download(
                 url_hash=url_hash,
                 output_directory=output_dir,
                 output_path=output_path,
+                video_info=video_info,
                 already_exists=True,
             )
 
         # Download video
         print(f"Downloading video from: {url}")
         video_info = await download_video(url, output_path)
+
+        # Save metadata.json with title and URL
+        import json
+        metadata = {
+            "url": url,
+            "url_hash": url_hash,
+            "title": video_info.get("title", "Unknown Title"),
+            "duration": video_info.get("duration", 0),
+            "fps": video_info.get("fps", 30),
+            "width": video_info.get("width", 1920),
+            "height": video_info.get("height", 1080),
+            "output_path": output_path,
+            "output_directory": output_dir,
+            "downloaded_at": __import__('datetime').datetime.now().isoformat()
+        }
+
+        metadata_path = os.path.join(output_dir, "metadata.json")
+        with open(metadata_path, 'w') as f:
+            json.dump(metadata, f, indent=2)
+
+        print(f"Saved metadata to: {metadata_path}")
 
         return DownloadResponse(
             success=True,
