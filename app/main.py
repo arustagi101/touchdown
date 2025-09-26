@@ -5,6 +5,7 @@ from .config import settings
 from .video_processor import extract_highlights_from_video
 from .downloader import download_video
 from .clip_extractor import extract_clips
+from .types import HighlightClip
 
 import os
 
@@ -95,6 +96,81 @@ async def processVideo(url: str = "https://www.youtube.com/watch?v=caqxkOKPE2U")
             "error": str(e),
             "video_url": url,
             "message": "Failed to process video",
+        }
+
+
+@app.get("/extract-clips")
+async def extract_clips_from_video(
+    video_path: str,
+    output_dir: str = None
+):
+    """
+    Extract highlight clips from a local video file.
+    
+    Args:
+        video_path: Path to the local video file
+        output_dir: Directory to save clips (optional, defaults to ./output/clips_TIMESTAMP)
+    """
+    try:
+        # Check if video file exists
+        if not os.path.exists(video_path):
+            return {
+                "success": False,
+                "error": f"Video file not found: {video_path}",
+                "message": "Please provide a valid video file path"
+            }
+        
+        # Set default output directory if not provided
+        if output_dir is None:
+            import datetime
+            timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            output_dir = f"./output/clips_{timestamp}"
+        
+        # Create output directory
+        os.makedirs(output_dir, exist_ok=True)
+        
+        # Define default highlights
+        highlight_clips = [
+            HighlightClip(
+                start_time=1.0,
+                end_time=3.0,
+                description="Opening highlight - 2 second clip"
+            ),
+            HighlightClip(
+                start_time=5.0,
+                end_time=7.5,
+                description="Main action - 2.5 second clip"
+            ),
+            HighlightClip(
+                start_time=8.0,
+                end_time=9.0,
+                description="Closing highlight - 1 second clip"
+            )
+        ]
+        
+        # Extract clips
+        clip_files = await extract_clips(highlight_clips, video_path, output_dir)
+        
+        # Calculate total size
+        total_size = sum(os.path.getsize(clip["file"]) for clip in clip_files)
+        
+        return {
+            "success": True,
+            "message": "Clips extracted successfully",
+            "video_path": video_path,
+            "output_directory": output_dir,
+            "highlights_count": len(highlight_clips),
+            "clips": clip_files,
+            "total_size_bytes": total_size,
+            "total_size_mb": round(total_size / 1024 / 1024, 2)
+        }
+        
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e),
+            "message": "Failed to extract clips",
+            "video_path": video_path
         }
 
 
