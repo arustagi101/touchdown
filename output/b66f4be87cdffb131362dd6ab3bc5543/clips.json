@@ -1,0 +1,52 @@
+[
+  {
+    "start_time": 2458.0,
+    "end_time": 2470.0,
+    "start_time_formatted": "40:58",
+    "end_time_formatted": "41:10",
+    "duration": 12.0,
+    "description": "Lions stone the Ravens on 4th-and-goal as Lamar Jackson is stripped at the 1 and Detroit recovers, denying the tie.",
+    "importance_score": 10.0,
+    "category": "turnover"
+  },
+  {
+    "start_time": 6544.0,
+    "end_time": 6639.0,
+    "start_time_formatted": "01:49:04",
+    "end_time_formatted": "01:50:39",
+    "duration": 95.0,
+    "description": "On 4th-and-2, Goff drops a dime to St. Brown, and one play later Montgomery rips a 31-yd TD to make it a two-score game.",
+    "importance_score": 9.8,
+    "category": "touchdown"
+  },
+  {
+    "start_time": 1995.0,
+    "end_time": 2026.0,
+    "start_time_formatted": "33:15",
+    "end_time_formatted": "33:46",
+    "duration": 31.0,
+    "description": "Detroit caps a 98-yard, 9-minute march with a David Montgomery goal-line TD to reclaim the lead.",
+    "importance_score": 9.5,
+    "category": "touchdown"
+  },
+  {
+    "start_time": 4946.0,
+    "end_time": 4983.0,
+    "start_time_formatted": "01:22:26",
+    "end_time_formatted": "01:23:03",
+    "duration": 37.0,
+    "description": "On 4th-and-1, Detroit runs a gadget pitch from St. Brown to Gibbs for a walk-in touchdown.",
+    "importance_score": 9.2,
+    "category": "touchdown"
+  },
+  {
+    "start_time": 5799.0,
+    "end_time": 5851.0,
+    "start_time_formatted": "01:36:39",
+    "end_time_formatted": "01:37:31",
+    "duration": 52.0,
+    "description": "Aiden Hutchinson punches the ball from Derrick Henry, and DJ Reed recovers to set up insurance points.",
+    "importance_score": 9.0,
+    "category": "turnover"
+  }
+]
