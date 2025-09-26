@@ -4,6 +4,7 @@ from typing import List
 from fastapi import FastAPI
 
 from .processor.highlight_extractor import HighlightExtractor
+from .final_highlight_creator import FinalHighlightCreator
 
 from .config import settings
 from .downloader import download_video
@@ -185,12 +186,23 @@ async def processVideo(url: str = "https://www.youtube.com/watch?v=caqxkOKPE2U")
             download_result.output_directory,
         )
 
+        # Step 4: Create final highlight
+        print("Creating final highlight video...")
+        creator = FinalHighlightCreator()
+        final_highlight_result = await creator.create_final_highlight(
+            highlights_result,
+            download_result.output_path,
+            download_result.output_directory,
+            overwrite=False  # Use cache by default in processVideo
+        )
+
         return {
             "success": True,
             "video_url": url,
             "download_step": download_result,
             "highlights_count": len(highlights_result),
             "clips": clip_files,
+            "final_highlight": final_highlight_result,
             "message": "Video processed successfully",
         }
 
@@ -264,6 +276,104 @@ async def processVideo(url: str = "https://www.youtube.com/watch?v=caqxkOKPE2U")
 #             "message": "Failed to extract clips",
 #             "video_url": url
 #         }
+
+
+@app.get("/final-highlight")
+async def create_final_highlight(
+    url: str = "https://www.youtube.com/watch?v=caqxkOKPE2U",
+    overwrite: bool = False
+):
+    """
+    Create a final highlight video by stitching all clips together without overlap.
+    
+    Args:
+        url: YouTube video URL
+        overwrite: Whether to overwrite existing final highlight
+        
+    Returns:
+        Dictionary with result information including path to final_highlight.mp4
+    """
+    try:
+        # Get URL hash and output directory
+        url_hash, output_dir = hash_url(url)
+        final_highlight_path = os.path.join(output_dir, "final_highlight.mp4")
+        
+        # Check if final highlight already exists and overwrite is False
+        if os.path.exists(final_highlight_path) and not overwrite:
+            # Get file info for cache details
+            file_size = os.path.getsize(final_highlight_path)
+            file_mtime = os.path.getmtime(final_highlight_path)
+            
+            return {
+                "success": True,
+                "message": "Final highlight already exists (cached)",
+                "output_path": final_highlight_path,
+                "already_exists": True,
+                "file_size_bytes": file_size,
+                "file_size_mb": round(file_size / 1024 / 1024, 2),
+                "cached_at": file_mtime,
+                "video_url": url,
+                "url_hash": url_hash,
+                "output_directory": output_dir
+            }
+        
+        # Load highlights from clips.json
+        clips_json_path = os.path.join(output_dir, "clips.json")
+        if not os.path.exists(clips_json_path):
+            return {
+                "success": False,
+                "error": "No clips.json found. Please run /highlights endpoint first.",
+                "message": "Highlights not found",
+                "video_url": url
+            }
+        
+        # Load highlights
+        import json
+        with open(clips_json_path, 'r') as f:
+            clips_data = json.load(f)
+        
+        # Convert to HighlightClip objects
+        highlights = []
+        for clip_data in clips_data:
+            highlight = HighlightClip(**clip_data)
+            highlights.append(highlight)
+        
+        if not highlights:
+            return {
+                "success": False,
+                "error": "No highlights found in clips.json",
+                "message": "No highlights available",
+                "video_url": url
+            }
+        
+        # Get video path
+        video_path = os.path.join(output_dir, "video.mp4")
+        if not os.path.exists(video_path):
+            return {
+                "success": False,
+                "error": "Video file not found. Please run /download endpoint first.",
+                "message": "Source video not found",
+                "video_url": url
+            }
+        
+        # Create final highlight
+        creator = FinalHighlightCreator()
+        result = await creator.create_final_highlight(highlights, video_path, output_dir, overwrite)
+        
+        if result["success"]:
+            result["video_url"] = url
+            result["url_hash"] = url_hash
+            result["output_directory"] = output_dir
+        
+        return result
+        
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e),
+            "message": "Failed to create final highlight",
+            "video_url": url
+        }
 
 
 @app.get("/config")
