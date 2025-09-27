@@ -17,3 +17,8 @@ wheels/
 !app/highlights_outro.mp4
 
 .DS_Store
+
+# Frontend dependencies and build files
+frontend/node_modules/
+frontend/.next/
+frontend/dist/
