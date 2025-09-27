@@ -1,0 +1,52 @@
+[
+  {
+    "start_time": 1332.0,
+    "end_time": 1337.0,
+    "start_time_formatted": "22:12",
+    "end_time_formatted": "22:17",
+    "duration": 5.0,
+    "description": "Matt Prater nails a 32-yard field goal as time expires to win it for Buffalo, completing a stunning comeback.",
+    "importance_score": 10.0,
+    "category": "field_goal"
+  },
+  {
+    "start_time": 240.0,
+    "end_time": 246.0,
+    "start_time_formatted": "04:00",
+    "end_time_formatted": "04:06",
+    "duration": 6.0,
+    "description": "Derrick Henry fumbles after Ed Oliver punches it out; Terrel Bernard recovers, flipping momentum to the Bills late.",
+    "importance_score": 9.6,
+    "category": "turnover"
+  },
+  {
+    "start_time": 35.0,
+    "end_time": 52.0,
+    "start_time_formatted": "00:35",
+    "end_time_formatted": "00:52",
+    "duration": 17.0,
+    "description": "On 4th-and-2, Josh Allen\u2019s tipped pass finds Keon Coleman for a wild touchdown to keep Buffalo alive.",
+    "importance_score": 9.4,
+    "category": "touchdown"
+  },
+  {
+    "start_time": 783.0,
+    "end_time": 790.0,
+    "start_time_formatted": "13:03",
+    "end_time_formatted": "13:10",
+    "duration": 7.0,
+    "description": "Christian Benford tackles DeAndre Hopkins short of the sticks on 3rd down, forcing a punt and setting up Buffalo\u2019s winning drive.",
+    "importance_score": 9.2,
+    "category": "defensive_stop"
+  },
+  {
+    "start_time": 470.0,
+    "end_time": 480.0,
+    "start_time_formatted": "07:50",
+    "end_time_formatted": "08:00",
+    "duration": 10.0,
+    "description": "Josh Allen leaps over the pile and breaks the plane for a clutch goal-line touchdown to make it a two-point game.",
+    "importance_score": 9.0,
+    "category": "touchdown"
+  }
+]

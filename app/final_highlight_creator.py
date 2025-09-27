@@ -200,7 +200,7 @@ class FinalHighlightCreator:
         return normalized_intro_path, normalized_outro_path
     
     async def _normalize_video_file(self, input_path: str, output_path: str, 
-                                   target_properties: dict, max_duration: float = 2.0) -> str:
+                                   target_properties: dict, max_duration: float = 7.0) -> str:
         """
         Normalize a video file to match target properties and limit duration.
         
